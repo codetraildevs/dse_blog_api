@@ -42,16 +42,17 @@ export const getPostById = (req, res) => {
     });
 };
 
-//create new post
+//create new post and i need auth id to be the loggged in
+
 export const createPost = (req, res) => {
-    const { title,slug, content,status,  category_id,tag_id,author_id, } = req.body;
-    const query = `INSERT INTO posts (title,slug, content, status, category_id,tag_id,author_id)
-                     VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    db.query(query, [title,slug, content,status, category_id, tag_id, author_id], (err, results) => {
+    const { title, slug, content, status, category_id, tag_id } = req.body;
+    const author_id = req.user.id; // Get logged-in user ID from auth middleware
+
+    db.query("INSERT INTO posts (title, slug, content, status, category_id, tag_id, author_id)VALUES (?, ?, ?, ?, ?, ?,?)", [title, slug, content, status, category_id, tag_id, author_id], (err, results) => {
         if (err) {
             return res.status(500).json({ message: 'Database query error', error: err });
         }
-        res.status(201).json({ message: 'Post created successfully', post: results });
+        res.status(201).json({ message: 'Post created successfully', postId: results.insertId });
     }); 
 };
 
